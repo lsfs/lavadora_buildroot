@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# Lavadora simplificada
+#
+
+start() {
+        printf "Iniciando a lavadora: "
+        if python /usr/local/bin/lavadora_raspberry/main.py &
+        then
+          echo $! > /tmp/lavadora.pid
+          echo "SUCESSO"
+        else
+          echo "ERRO"
+        fi
+}
+
+stop() {
+        PPID=`cat /tmp/lavadora.pid`
+        printf "Parando a lavadora:"
+        if kill -15 $PPID
+        then
+          rm /tmp/lavadora.pid
+          echo "SUCESSO"
+        else
+          echo "FALHA"
+        fi
+}
+
+restart() {
+        stop
+        start
+}
+
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	restart
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
